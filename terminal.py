@@ -1,7 +1,7 @@
 import tkinter
 from tkinter import ttk
 import com
-#from befehls_verlauf import BefehlsVerlauf
+from befehls_verlauf import BefehlsVerlauf
 
 class Terminal(tkinter.Frame):
     def __init__(self, root, lines_length=10000):
@@ -50,13 +50,13 @@ class Terminal(tkinter.Frame):
         self.listbox["xscrollcommand"] = self.scroll_x.set
         #entry
         self.entry = tkinter.Entry(self.entry_org_frame, width = 63)
-        #self.listbox.insert("end", *[i for i in range(100)])
+        
         self.entry.pack()
         #gerbten frame packen
         self.pack()
 
 
-        #self.verlauf = BefehlsVerlauf(100)
+        self.verlauf = BefehlsVerlauf(100)
 
         self.max_length = lines_length
         self.autoscroll = True
@@ -86,13 +86,18 @@ class Terminal(tkinter.Frame):
         com.print(self.entry.get() + self.terminierung_lookup[self.drop_down_ter_var.get()])
         self.listbox.insert(tkinter.END, self.entry.get())
         self.listbox.itemconfig(tkinter.END, fg="blue")
+        self.verlauf.append(self.entry.get())
         self.entry.delete(0, tkinter.END)
 
     def entry_up_bind(self, para):
-        pass
+        self.entry.delete(0, tkinter.END)
+        self.entry.insert(0, self.verlauf.read())
+        self.verlauf.pointer_up()
 
     def entry_down_bind(self, para):
-        pass
+        self.entry.delete(0, tkinter.END)
+        self.entry.insert(0, self.verlauf.read())
+        self.verlauf.pointer_down()
 
     def verbinden_cmd(self):
         com.close()
@@ -116,3 +121,5 @@ class Terminal(tkinter.Frame):
             if com.chrs_in_buf() > 0:
                 self.listbox.insert(tkinter.END, com.read_line())
         self.update_com_ports()
+        if self.autoscroll_checkbox_var.get() == True:
+            self.listbox.see(tkinter.END)
