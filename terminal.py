@@ -85,6 +85,7 @@ class Terminal(tkinter.Frame):
             return
         com.print(self.entry.get() + self.terminierung_lookup[self.drop_down_ter_var.get()])
         self.listbox.insert(tkinter.END, self.entry.get())
+        self.listbox.itemconfig(tkinter.END, fg="blue")
         self.entry.delete(0, tkinter.END)
 
     def entry_up_bind(self, para):
