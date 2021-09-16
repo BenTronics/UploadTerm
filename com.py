@@ -31,3 +31,9 @@ def read(amount):
 
 def read_line():
     return com_handler.readline().decode("iso-8859-1")
+
+def chrs_in_buf():
+    return com_handler.inWaiting()
+
+def is_open():
+    return com_handler.isOpen()
