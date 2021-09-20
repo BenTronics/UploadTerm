@@ -8,7 +8,7 @@ uploader_frame = tkinter.Frame(fenster)
 terminal = Terminal(terminal_frame)
 uploader = Uploader(uploader_frame)
 terminal_frame.pack(side = "left")
-uploader_frame.pack(side = "right")
+uploader_frame.pack(side = "right", expand=True, fill="y")
 
 while True:
     fenster.update()
