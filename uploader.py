@@ -79,3 +79,4 @@ class Uploader(tkinter.Frame):
                 sleep(0.3)
                 com.println(chr(26))
                 self.progressbar["value"] = 100
+                com.println("run")
