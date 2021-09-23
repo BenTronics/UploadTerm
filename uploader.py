@@ -1,6 +1,7 @@
 import tkinter
 from tkinter import Radiobutton, ttk
 from tkinter.filedialog import askopenfilename
+from time import sleep
 import com
 
 class Uploader(tkinter.Frame):
@@ -27,7 +28,7 @@ class Uploader(tkinter.Frame):
         self.crunch_radiobtn_super_crunch = tkinter.Radiobutton(self.bedienung_org_frame, text="super Crunch", variable=self.crunch, value=2)
         self.crunch_radiobtn_super_crunch.pack()
         #progressbar
-        self.progressbar = ttk.Progressbar(self.upload_org_frame, length=100, mode="indeterminate")
+        self.progressbar = ttk.Progressbar(self.upload_org_frame, length=200, mode="determinate")
         self.progressbar.pack()
         #upload btn
         self.upload_btn = tkinter.Button(self.upload_org_frame, text = "Upload", width = 12, pady = 2, command=self.upload_cmd)
@@ -35,6 +36,8 @@ class Uploader(tkinter.Frame):
 
         self.datei_pfad = ""
         self.code = []
+        self.uploader_state = "idle"
+        self.code_pointer = 0
 
     def open_file(self):
         self.datei_pfad = askopenfilename(filetypes=[("Basic Skript", "*.bas")])
@@ -46,11 +49,33 @@ class Uploader(tkinter.Frame):
             self.datei_name_label["text"] = self.datei_pfad
     
     def upload_cmd(self):
-        file_handler = open(self.datei_pfad)
+        if self.uploader_state == "running":
+            return
+        try:
+            file_handler = open(self.datei_pfad)
+        except:
+            return
         self.code = file_handler.readlines()
-        #com.println(chr(3))
-        #com.println("AUTOSAVE")
-        for zeile in self.code:
-            print(zeile.replace("\n", "").replace("\r", ""))
-            #com.println(zeile.replace("\n", "").replace("\r", ""))
-        #com.println(chr(26))
+        self.uploader_state = "running"
+        self.code_pointer = 0
+        self.progressbar["value"] = 0
+        com.println(chr(3))
+        sleep(0.3)
+        com.println("AUTOSAVE")
+    
+    def update(self):
+        super().update()
+        if self.uploader_state == "running":
+            #zeile senden
+            com.println(self.code[self.code_pointer].replace("\n", "").replace("\r", ""))
+            #progressbar
+            self.progressbar["value"] = int((self.code_pointer / len(self.code)) * 100)
+            #pointer inkrementieren
+            self.code_pointer += 1
+            #wenn alle zeilen gesendet state zu idle setzen
+            if self.code_pointer >= len(self.code):
+                self.uploader_state = "idle"
+                #und stop kondition senden
+                sleep(0.3)
+                com.println(chr(26))
+                self.progressbar["value"] = 100

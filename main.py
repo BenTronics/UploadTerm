@@ -13,3 +13,4 @@ uploader_frame.pack(side = "right", expand=True, fill="y")
 while True:
     fenster.update()
     terminal.update()
+    uploader.update()
