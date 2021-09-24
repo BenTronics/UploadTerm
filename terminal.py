@@ -3,6 +3,8 @@ from tkinter import ttk
 import com
 from befehls_verlauf import BefehlsVerlauf
 
+aktiv = True
+
 class Terminal(tkinter.Frame):
     def __init__(self, root, lines_length=10000):
         super().__init__(root)
@@ -61,7 +63,6 @@ class Terminal(tkinter.Frame):
         self.max_length = lines_length
         self.autoscroll = True
         self.verbunden = False
-        self.aktiv = True
         self.terminierung_lookup = {"CR":"\r", "LF":"\n", "CR+LF":"\r\n"}
 
         self.drop_down_com["values"] = tuple(map(str, com.get_com_port_list()))
@@ -81,7 +82,7 @@ class Terminal(tkinter.Frame):
         self.autoscroll = False
 
     def entry_enter_bind(self, para):
-        if com.is_open() == False:
+        if com.is_open() == False or aktiv == False:
             return
         com.print(self.entry.get() + self.terminierung_lookup[self.drop_down_ter_var.get()])
         self.listbox.insert(tkinter.END, self.entry.get())
@@ -90,23 +91,29 @@ class Terminal(tkinter.Frame):
         self.entry.delete(0, tkinter.END)
 
     def entry_up_bind(self, para):
+        if aktiv == False:
+            return
         self.entry.delete(0, tkinter.END)
         self.entry.insert(0, self.verlauf.read())
         self.verlauf.pointer_up()
 
     def entry_down_bind(self, para):
+        if aktiv == False:
+            return
         self.entry.delete(0, tkinter.END)
         self.entry.insert(0, self.verlauf.read())
         self.verlauf.pointer_down()
 
     def verbinden_cmd(self):
+        if aktiv == False:
+            return
         com.close()
         if self.verbunden == False:
             com.open(self.drop_down_com_var.get(), self.drop_down_baud_var.get())
             self.verbunden = True
             self.verbinden_btn["bg"] = "lime green"
             self.verbinden_btn["text"] = "Trennen"
-        else:
+        elif self.verbunden == True:
             com.close()
             self.verbunden = False
             self.verbinden_btn["bg"] = "orange red"
@@ -115,9 +122,12 @@ class Terminal(tkinter.Frame):
     def update_com_ports(self):
         self.drop_down_com["values"] = tuple(com.get_com_port_list())
 
+
     def update(self):
         super().update()
-        if com.is_open() and self.aktiv == True:
+        if aktiv == False:
+            return
+        if com.is_open():
             if com.chrs_in_buf() > 0:
                 self.listbox.insert(tkinter.END, com.read_line())
         self.update_com_ports()

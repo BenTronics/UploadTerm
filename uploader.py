@@ -3,6 +3,7 @@ from tkinter import Radiobutton, ttk
 from tkinter.filedialog import askopenfilename
 from time import sleep
 import com
+import terminal
 
 class Uploader(tkinter.Frame):
     def __init__(self, root):
@@ -36,6 +37,7 @@ class Uploader(tkinter.Frame):
 
         self.datei_pfad = ""
         self.code = []
+        self.code_len = 0
         self.uploader_state = "idle"
         self.code_pointer = 0
 
@@ -55,7 +57,9 @@ class Uploader(tkinter.Frame):
             file_handler = open(self.datei_pfad)
         except:
             return
+        terminal.aktiv = False
         self.code = file_handler.readlines()
+        self.code_len = len(self.code)
         self.uploader_state = "running"
         self.code_pointer = 0
         self.progressbar["value"] = 0
@@ -69,14 +73,16 @@ class Uploader(tkinter.Frame):
             #zeile senden
             com.println(self.code[self.code_pointer].replace("\n", "").replace("\r", ""))
             #progressbar
-            self.progressbar["value"] = int((self.code_pointer / len(self.code)) * 100)
+            self.progressbar["value"] = int((self.code_pointer / self.code_len) * 100)
             #pointer inkrementieren
+            print(self.code_pointer)
             self.code_pointer += 1
             #wenn alle zeilen gesendet state zu idle setzen
-            if self.code_pointer >= len(self.code):
+            if self.code_pointer >= self.code_len:
                 self.uploader_state = "idle"
                 #und stop kondition senden
                 sleep(0.3)
                 com.println(chr(26))
                 self.progressbar["value"] = 100
                 com.println("run")
+                terminal.aktiv = True
