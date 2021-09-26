@@ -1,5 +1,6 @@
 import tkinter
 from tkinter import ttk
+from tkinter import messagebox
 import com
 from befehls_verlauf import BefehlsVerlauf
 
@@ -109,7 +110,11 @@ class Terminal(tkinter.Frame):
             return
         com.close()
         if self.verbunden == False:
-            com.open(self.drop_down_com_var.get(), self.drop_down_baud_var.get())
+            try:
+                com.open(self.drop_down_com_var.get(), self.drop_down_baud_var.get())
+            except:
+                messagebox.showwarning("Error","COM Port nicht erreichbar!")
+                return
             self.verbunden = True
             self.verbinden_btn["bg"] = "lime green"
             self.verbinden_btn["text"] = "Trennen"
