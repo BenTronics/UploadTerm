@@ -21,10 +21,10 @@ def get_com_port_list():
     return ports
 
 def print(message):
-    com_handler.write(message.encode("iso-8859-1"))
+    com_handler.write(message.encode())
 
 def println(message):
-    com_handler.write((message + "\r\n").encode("iso-8859-1"))
+    com_handler.write((message + "\r\n").encode())
 
 def read(amount):
     return com_handler.read(amount).decode("iso-8859-1")
